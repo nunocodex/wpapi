@@ -1,0 +1,21 @@
+{
+  "name": "nunopress/wpapi",
+  "description": "WordPress API Library",
+  "keywords": ["wordpress", "wpapi"],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "NunoPress LLC",
+      "email": "hello@nunopress.com"
+    }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": "^6.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "NunoPress\\WpApi\\": "src/"
+    }
+  }
+}
