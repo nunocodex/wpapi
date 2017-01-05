@@ -37,6 +37,7 @@ class WpApi
     const ROUTE_USERS           = 'users';
     const ROUTE_USER            = 'users/%d';
     const ROUTE_USER_ME         = 'users/me';
+    const ROUTE_SETTINGS        = 'settings';
 
     const ROUTE_ACF_OPTIONS     = 'options';
 
@@ -99,6 +100,18 @@ class WpApi
     public function pagination(int $num)
     {
         $this->params['page'] = $num;
+
+        return $this;
+    }
+
+    /**
+     * @param string $order
+     *
+     * @return $this
+     */
+    public function order(string $order)
+    {
+        $this->params['order'] = $order;
 
         return $this;
     }
@@ -476,6 +489,20 @@ class WpApi
     public function me()
     {
         $this->setWpUrl(self::ROUTE_USER_ME);
+
+        return $this;
+    }
+
+    /**
+     * @api GET /wp/v2/settings
+     *
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function settings()
+    {
+        $this->setWpUrl(self::ROUTE_SETTINGS);
 
         return $this;
     }
