@@ -11,7 +11,7 @@ class WpApi
 {
     const ROUTE_BASE            = 'wp-json/';
     const ROUTE_WP              = 'wp/v2/';
-    const ROUTE_ACF             = 'acf/v2/';
+    const ROUTE_ACF             = 'acf/v3/';
 
     const ROUTE_INDEX           = '';
     const ROUTE_POSTS           = 'posts';
