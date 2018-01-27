@@ -40,7 +40,7 @@ class WpApi
     const ROUTE_USER_ME         = 'users/me';
     const ROUTE_SETTINGS        = 'settings';
 
-    const ROUTE_ACF_OPTIONS     = 'options';
+    const ROUTE_ACF_OPTIONS     = 'options/%s';
 
     /**
      * @var string
@@ -487,7 +487,7 @@ class WpApi
     }
 
     /**
-     * @api GET /acf/v2
+     * @api GET /acf/v3
      *
      * @return $this
      * @throws \Exception
@@ -500,14 +500,15 @@ class WpApi
     }
 
     /**
-     * @api GET /acf/v2/options
+     * @api GET /acf/v3/options/<id>
      *
+     * @param string $id
      * @return $this
      * @throws \Exception
      */
-    public function options()
+    public function options(string $id = 'option')
     {
-        $this->setAcfUrl(self::ROUTE_ACF_OPTIONS);
+        $this->setAcfUrl(self::ROUTE_ACF_OPTIONS, [$id]);
 
         return $this;
     }
