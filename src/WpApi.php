@@ -487,7 +487,7 @@ class WpApi
     }
 
     /**
-     * @api GET /acf/v2
+     * @api GET /acf/v3
      *
      * @return $this
      * @throws \Exception
@@ -500,12 +500,13 @@ class WpApi
     }
 
     /**
-     * @api GET /acf/v2/options
+     * @api GET /acf/v2/options/<id>
      *
+     * @param string $id
      * @return $this
      * @throws \Exception
      */
-    public function options()
+    public function options(string $id = 'option')
     {
         $this->setAcfUrl(self::ROUTE_ACF_OPTIONS);
 
