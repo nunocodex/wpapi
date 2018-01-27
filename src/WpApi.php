@@ -12,7 +12,7 @@ class WpApi
     const ROUTE_BASE            = 'wp-json/';
     const ROUTE_WP              = 'wp/v2/';
 
-    const ROUTE_ACF             = 'acf/v2/';
+    const ROUTE_ACF             = 'acf/v3/';
 
     const ROUTE_INDEX           = '';
     const ROUTE_POSTS           = 'posts';
@@ -288,9 +288,7 @@ class WpApi
      * @api GET /wp/v2/types/<id>
      *
      * @param int $id
-     *
      * @return $this
-     *
      * @throws \Exception
      */
     public function type(int $id)
@@ -304,7 +302,6 @@ class WpApi
      * @api GET /wp/v2/statuses
      *
      * @return $this
-     *
      * @throws \Exception
      */
     public function statuses()
@@ -318,9 +315,7 @@ class WpApi
      * @api GET /wp/v2/statuses/<id>
      *
      * @param int $id
-     *
      * @return $this
-     *
      * @throws \Exception
      */
     public function status(int $id)
@@ -334,7 +329,6 @@ class WpApi
      * @api GET|POST /wp/v2/comments
      *
      * @return $this
-     *
      * @throws \Exception
      */
     public function comments()
@@ -348,9 +342,7 @@ class WpApi
      * @api GET|POST|DELETE /wp/v2/comments/<id>
      *
      * @param int $id
-     *
      * @return $this
-     *
      * @throws \Exception
      */
     public function comment(int $id)
@@ -364,7 +356,6 @@ class WpApi
      * @api GET /wp/v2/taxonomies
      *
      * @return $this
-     *
      * @throws \Exception
      */
     public function taxonomies()
@@ -378,9 +369,7 @@ class WpApi
      * @api GET /wp/v2/taxonomies/<id>
      *
      * @param int $id
-     *
      * @return $this
-     *
      * @throws \Exception
      */
     public function taxonomy(int $id)
@@ -394,7 +383,6 @@ class WpApi
      * @api GET|POST /wp/v2/categories
      *
      * @return $this
-     *
      * @throws \Exception
      */
     public function categories()
@@ -408,9 +396,7 @@ class WpApi
      * @api GET|POST|DELETE /wp/v2/categories/<id>
      *
      * @param int $id
-     *
      * @return $this
-     *
      * @throws \Exception
      */
     public function category(int $id)
@@ -424,7 +410,6 @@ class WpApi
      * @api GET|POST /wp/v2/tags
      *
      * @return $this
-     *
      * @throws \Exception
      */
     public function tags()
@@ -438,9 +423,7 @@ class WpApi
      * @api GET|POST|DELETE /wp/v2/tags/<id>
      *
      * @param int $id
-     *
      * @return $this
-     *
      * @throws \Exception
      */
     public function tag(int $id)
@@ -454,7 +437,6 @@ class WpApi
      * @api GET|POST /wp/v2/users
      *
      * @return $this
-     *
      * @throws \Exception
      */
     public function users()
@@ -468,9 +450,7 @@ class WpApi
      * @api GET|POST|DELETE /wp/v2/users/<id>
      *
      * @param int $id
-     *
      * @return $this
-     *
      * @throws \Exception
      */
     public function user(int $id)
@@ -484,7 +464,6 @@ class WpApi
      * @api GET|POST /wp/v2/users
      *
      * @return $this
-     *
      * @throws \Exception
      */
     public function me()
@@ -498,7 +477,6 @@ class WpApi
      * @api GET /wp/v2/settings
      *
      * @return $this
-     *
      * @throws \Exception
      */
     public function settings()
@@ -512,6 +490,7 @@ class WpApi
      * @api GET /acf/v2
      *
      * @return $this
+     * @throws \Exception
      */
     public function acf()
     {
@@ -524,6 +503,7 @@ class WpApi
      * @api GET /acf/v2/options
      *
      * @return $this
+     * @throws \Exception
      */
     public function options()
     {
@@ -536,7 +516,6 @@ class WpApi
 
     /**
      * @return mixed
-     *
      * @throws \Exception
      */
     public function get()
@@ -550,9 +529,7 @@ class WpApi
 
     /**
      * @param array $data
-     *
-     * @return mixed
-     *
+     * @return array|null
      * @throws \Exception
      */
     public function save(array $data = [])
@@ -566,8 +543,7 @@ class WpApi
     }
 
     /**
-     * @return mixed
-     *
+     * @return array|null
      * @throws \Exception
      */
     public function delete()
@@ -592,10 +568,8 @@ class WpApi
     }
 
     /**
-     * @param string $url
-     *
+     * @param $url
      * @return string
-     *
      * @throws \Exception
      */
     protected function getBaseUrl($url)
@@ -608,8 +582,9 @@ class WpApi
     }
 
     /**
-     * @param string $url
+     * @param $url
      * @param array $params
+     * @throws \Exception
      */
     protected function setBaseUrl($url, array $params = [])
     {
@@ -621,8 +596,9 @@ class WpApi
     }
 
     /**
-     * @param string $url
+     * @param $url
      * @param array $params
+     * @throws \Exception
      */
     protected function setWpUrl($url, array $params = [])
     {
@@ -634,8 +610,9 @@ class WpApi
     }
 
     /**
-     * @param string $url
+     * @param $url
      * @param array $params
+     * @throws \Exception
      */
     protected function setAcfUrl($url, array $params = [])
     {
@@ -647,15 +624,16 @@ class WpApi
     }
 
     /**
-     * @param string $method
-     * @param string $uri
+     * @param $method
+     * @param $uri
      * @param array $options
-     *
-     * @return array|null
+     * @return mixed
      */
     protected function request($method, $uri, array $options = [])
     {
         $response = $this->client->request($method, $uri, $options);
+
+        $this->url = '';
 
         return json_decode($response->getBody()->getContents(), true);
     }
