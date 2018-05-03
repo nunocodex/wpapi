@@ -1,6 +1,6 @@
 <?php
 
-namespace NunoPress\WpApi;
+namespace NunoCodex\WpApi;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
@@ -8,7 +8,7 @@ use Psr\Http\Message\UriInterface;
 /**
  * Interface WpApiClientInterface
  *
- * @package NunoPress\WpApi
+ * @package NunoCodex\WpApi
  */
 interface WpApiClientInterface
 {
