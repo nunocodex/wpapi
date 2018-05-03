@@ -4,7 +4,7 @@ This is library for access to WordPress API websites easy.
 # Installation
 You can simply install with composer:
 
-`composer require nunopress/wpapi`
+`composer require nunocodex/wpapi`
 
 # Readme is working progress
 
