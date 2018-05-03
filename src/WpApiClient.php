@@ -1,13 +1,13 @@
 <?php
 
-namespace NunoPress\WpApi;
+namespace NunoCodex\WpApi;
 
 use GuzzleHttp\Client;
 
 /**
  * Class WpApiClient
  *
- * @package NunoPress\WpApi
+ * @package NunoCodex\WpApi
  */
 class WpApiClient extends Client implements WpApiClientInterface
 {
