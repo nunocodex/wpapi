@@ -1,24 +1,24 @@
 <?php
 
-namespace NunoPress\WpApi;
+namespace NunoCodex\WpApi;
 
 /**
  * Class WpApi
  *
- * @package NunoPress\WpApi
+ * @package NunoCodex\WpApi
  */
 class WpApi
 {
     const ROUTE_BASE            = 'wp-json/';
-    const ROUTE_WP              = 'wp/v2/';
+    const ROUTE_WP              = 'wp/%s/';
 
-    const ROUTE_ACF             = 'acf/v3/';
+    const ROUTE_ACF             = 'acf/%s/';
 
     const ROUTE_INDEX           = '';
     const ROUTE_POSTS           = 'posts';
     const ROUTE_POST            = 'posts/%d';
-    const ROUTE_POST_REVISIONS = 'posts/%d/revisions';
-    const ROUTE_POST_REVISION  = 'posts/%d/revisions/%d';
+    const ROUTE_POST_REVISIONS  = 'posts/%d/revisions';
+    const ROUTE_POST_REVISION   = 'posts/%d/revisions/%d';
     const ROUTE_PAGES           = 'pages';
     const ROUTE_PAGE            = 'pages/%d';
     const ROUTE_MEDIAS          = 'media';
@@ -56,6 +56,16 @@ class WpApi
      * @var array
      */
     private $params = [];
+
+    /**
+     * @var string
+     */
+    private $wpVersion = 'v2';
+
+    /**
+     * @var string
+     */
+    private $acfVersion = 'v3';
 
     /**
      * WpApi constructor.
@@ -117,6 +127,60 @@ class WpApi
         return $this;
     }
 
+    /**
+     * @param string $version
+     */
+    public function setWpVersion(string $version)
+    {
+        $this->wpVersion = $version;
+    }
+
+    /**
+     * @param string $version
+     */
+    public function setAcfVersion(string $version)
+    {
+        $this->acfVersion = $version;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWpVersion()
+    {
+        return $this->wpVersion;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAcfVersion()
+    {
+        return $this->acfVersion;
+    }
+
+    /**
+     * @param string $url
+     * @return string
+     */
+    public function getRouteWp(string $url = '')
+    {
+        $string = sprintf(self::ROUTE_WP, $this->getWpVersion()) . $url;
+
+        return str_replace('//', '/', $string);
+    }
+
+    /**
+     * @param string $url
+     * @return string
+     */
+    public function getRouteAcf(string $url = '')
+    {
+        $string = sprintf(self::ROUTE_ACF, $this->getAcfVersion()) . $url;
+
+        return str_replace('//', '/', $string);
+    }
+
     /* ----------------------------------------------------------------------------------- */
 
     /**
@@ -134,7 +198,7 @@ class WpApi
     }
 
     /**
-     * @api GET /wp/v2/
+     * @api GET /wp/{wp_version}/
      *
      * @return $this
      *
@@ -148,7 +212,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST /wp/v2/posts
+     * @api GET|POST /wp/{wp_version}/posts
      *
      * @return $this
      *
@@ -162,7 +226,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST|DELETE /wp/v2/posts/<id>
+     * @api GET|POST|DELETE /wp/{wp_version}/posts/<id>
      *
      * @param int $id
      *
@@ -178,7 +242,7 @@ class WpApi
     }
 
     /**
-     * @api GET /wp/v2/posts/<parent_id>/revisions
+     * @api GET /wp/{wp_version}/posts/<parent_id>/revisions
      *
      * @param int $id
      *
@@ -194,7 +258,7 @@ class WpApi
     }
 
     /**
-     * @api GET|DELETE /wp/v2/posts/<parent_id>/revisions/<id>
+     * @api GET|DELETE /wp/{wp_version}/posts/<parent_id>/revisions/<id>
      *
      * @param int $postID
      * @param int $revisionID
@@ -211,7 +275,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST /wp/v2/pages
+     * @api GET|POST /wp/{wp_version}/pages
      *
      * @return $this
      *
@@ -225,7 +289,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST|DELETE /wp/v2/pages/<id>
+     * @api GET|POST|DELETE /wp/{wp_version}/pages/<id>
      *
      * @param int $id
      *
@@ -241,7 +305,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST /wp/v2/media
+     * @api GET|POST /wp/{wp_version}/media
      *
      * @return $this
      *
@@ -255,7 +319,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST|DELETE /wp/v2/media/<id>
+     * @api GET|POST|DELETE /wp/{wp_version}/media/<id>
      *
      * @param int $id
      *
@@ -271,7 +335,7 @@ class WpApi
     }
 
     /**
-     * @api GET /wp/v2/types
+     * @api GET /wp/{wp_version}/types
      *
      * @return $this
      *
@@ -285,7 +349,7 @@ class WpApi
     }
 
     /**
-     * @api GET /wp/v2/types/<id>
+     * @api GET /wp/{wp_version}/types/<id>
      *
      * @param int $id
      * @return $this
@@ -299,7 +363,7 @@ class WpApi
     }
 
     /**
-     * @api GET /wp/v2/statuses
+     * @api GET /wp/{wp_version}/statuses
      *
      * @return $this
      * @throws \Exception
@@ -312,7 +376,7 @@ class WpApi
     }
 
     /**
-     * @api GET /wp/v2/statuses/<id>
+     * @api GET /wp/{wp_version}/statuses/<id>
      *
      * @param int $id
      * @return $this
@@ -326,7 +390,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST /wp/v2/comments
+     * @api GET|POST /wp/{wp_version}/comments
      *
      * @return $this
      * @throws \Exception
@@ -339,7 +403,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST|DELETE /wp/v2/comments/<id>
+     * @api GET|POST|DELETE /wp/{wp_version}/comments/<id>
      *
      * @param int $id
      * @return $this
@@ -353,7 +417,7 @@ class WpApi
     }
 
     /**
-     * @api GET /wp/v2/taxonomies
+     * @api GET /wp/{wp_version}/taxonomies
      *
      * @return $this
      * @throws \Exception
@@ -366,7 +430,7 @@ class WpApi
     }
 
     /**
-     * @api GET /wp/v2/taxonomies/<id>
+     * @api GET /wp/{wp_version}/taxonomies/<id>
      *
      * @param int $id
      * @return $this
@@ -380,7 +444,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST /wp/v2/categories
+     * @api GET|POST /wp/{wp_version}/categories
      *
      * @return $this
      * @throws \Exception
@@ -393,7 +457,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST|DELETE /wp/v2/categories/<id>
+     * @api GET|POST|DELETE /wp/{wp_version}/categories/<id>
      *
      * @param int $id
      * @return $this
@@ -407,7 +471,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST /wp/v2/tags
+     * @api GET|POST /wp/{wp_version}/tags
      *
      * @return $this
      * @throws \Exception
@@ -420,7 +484,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST|DELETE /wp/v2/tags/<id>
+     * @api GET|POST|DELETE /wp/{wp_version}/tags/<id>
      *
      * @param int $id
      * @return $this
@@ -434,7 +498,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST /wp/v2/users
+     * @api GET|POST /wp/{wp_version}/users
      *
      * @return $this
      * @throws \Exception
@@ -447,7 +511,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST|DELETE /wp/v2/users/<id>
+     * @api GET|POST|DELETE /wp/{wp_version}/users/<id>
      *
      * @param int $id
      * @return $this
@@ -461,7 +525,7 @@ class WpApi
     }
 
     /**
-     * @api GET|POST /wp/v2/users
+     * @api GET|POST /wp/{wp-version}/users
      *
      * @return $this
      * @throws \Exception
@@ -474,7 +538,7 @@ class WpApi
     }
 
     /**
-     * @api GET /wp/v2/settings
+     * @api GET /wp/{wp-version}/settings
      *
      * @return $this
      * @throws \Exception
@@ -487,7 +551,7 @@ class WpApi
     }
 
     /**
-     * @api GET /acf/v3
+     * @api GET /acf/{acf-version}
      *
      * @return $this
      * @throws \Exception
@@ -500,7 +564,7 @@ class WpApi
     }
 
     /**
-     * @api GET /acf/v3/options/<id>
+     * @api GET /acf/{acf-version}/options/<id>
      *
      * @param string $id
      * @return $this
@@ -514,6 +578,18 @@ class WpApi
     }
 
     /* ----------------------------------------------------------------------------------- */
+
+    public function getDefaultBuild()
+    {
+        return [
+            'fields' => []
+        ];
+    }
+
+    public function build(array $params = [])
+    {
+
+    }
 
     /**
      * @return mixed
@@ -607,7 +683,7 @@ class WpApi
             $url = sprintf($url, ...$params);
         }
 
-        $this->setBaseUrl(self::ROUTE_WP . $url);
+        $this->setBaseUrl($this->getRouteWp($url));
     }
 
     /**
@@ -621,7 +697,7 @@ class WpApi
             $url = sprintf($url, ...$params);
         }
 
-        $this->setBaseUrl(self::ROUTE_ACF . $url);
+        $this->setBaseUrl($this->getRouteAcf($url));
     }
 
     /**
@@ -634,8 +710,16 @@ class WpApi
     {
         $response = $this->client->request($method, $uri, $options);
 
-        $this->url = '';
+        $this->clearUrl();
 
         return json_decode($response->getBody()->getContents(), true);
+    }
+
+    /**
+     * @return void
+     */
+    protected function clearUrl()
+    {
+        $this->url = '';
     }
 }
