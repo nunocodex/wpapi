@@ -2,6 +2,9 @@
 
 namespace NunoCodex\WpApi;
 
+use NunoCodex\WpApi\Resources\WordPress\PostsResource;
+use NunoCodex\WpApi\Services\ClientService;
+
 /**
  * Class WpApi
  *
@@ -9,11 +12,6 @@ namespace NunoCodex\WpApi;
  */
 class WpApi
 {
-    const ROUTE_BASE            = 'wp-json/';
-    const ROUTE_WP              = 'wp/%s/';
-
-    const ROUTE_ACF             = 'acf/%s/';
-
     const ROUTE_INDEX           = '';
     const ROUTE_POSTS           = 'posts';
     const ROUTE_POST            = 'posts/%d';
@@ -43,683 +41,71 @@ class WpApi
     const ROUTE_ACF_OPTIONS     = 'options/%s';
 
     /**
-     * @var string
-     */
-    private $client;
-
-    /**
-     * @var string
-     */
-    private $url;
-
-    /**
      * @var array
      */
     private $params = [];
 
     /**
-     * @var string
-     */
-    private $wpVersion = 'v2';
-
-    /**
-     * @var string
-     */
-    private $acfVersion = 'v3';
-
-    /**
      * WpApi constructor.
      *
-     * @param WpApiClientInterface $client
+     * @param array $params
      */
-    public function __construct(WpApiClientInterface $client)
+    public function __construct(array $params = [])
     {
-        $this->client = $client;
+        $this->setParams($params);
     }
-
-    /* ----------------------------------------------------------------------------------- */
 
     /**
      * @param array $params
-     *
-     * @return $this
      */
-    public function filter(array $params)
+    public function setParams(array $params)
     {
-        foreach ($params as $k => $v) {
-            $this->params['filter'][ $k ] = $v;
-        }
-
-        return $this;
+        $this->params = array_merge($this->getParams(), $params);
     }
 
     /**
-     * @return $this
+     * @param string $key
+     * @param $value
      */
-    public function embed()
+    public function setParam(string $key, $value)
     {
-        $this->params['_embed'] = true;
-
-        return $this;
+        $this->params[$key] = $value;
     }
 
     /**
-     * @param int $num
-     *
-     * @return $this
+     * @return array
      */
-    public function pagination(int $num)
+    public function getParams()
     {
-        $this->params['page'] = $num;
-
-        return $this;
+        return $this->params;
     }
 
     /**
-     * @param string $order
-     *
-     * @return $this
+     * @param string $key
+     * @param null $default
+     * @return mixed|null
      */
-    public function order(string $order)
+    public function getParam(string $key, $default = null)
     {
-        $this->params['order'] = $order;
-
-        return $this;
+        return (isset($this->params[$key])) ? $this->params[$key] : $default;
     }
 
     /**
-     * @param string $version
+     * @param array $options
+     * @return ClientService
      */
-    public function setWpVersion(string $version)
+    public function getClient(array $options = [])
     {
-        $this->wpVersion = $version;
-    }
-
-    /**
-     * @param string $version
-     */
-    public function setAcfVersion(string $version)
-    {
-        $this->acfVersion = $version;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWpVersion()
-    {
-        return $this->wpVersion;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAcfVersion()
-    {
-        return $this->acfVersion;
-    }
-
-    /**
-     * @param string $url
-     * @return string
-     */
-    public function getRouteWp(string $url = '')
-    {
-        $string = sprintf(self::ROUTE_WP, $this->getWpVersion()) . $url;
-
-        return str_replace('//', '/', $string);
-    }
-
-    /**
-     * @param string $url
-     * @return string
-     */
-    public function getRouteAcf(string $url = '')
-    {
-        $string = sprintf(self::ROUTE_ACF, $this->getAcfVersion()) . $url;
-
-        return str_replace('//', '/', $string);
+        return new ClientService($options);
     }
 
     /* ----------------------------------------------------------------------------------- */
 
     /**
-     * @api GET /
-     *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function base()
-    {
-        $this->setBaseUrl(self::ROUTE_INDEX);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /wp/{wp_version}/
-     *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function index()
-    {
-        $this->setWpUrl(self::ROUTE_INDEX);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST /wp/{wp_version}/posts
-     *
-     * @return $this
-     *
-     * @throws \Exception
+     * @return PostsResource
      */
     public function posts()
     {
-        $this->setWpUrl(self::ROUTE_POSTS);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST|DELETE /wp/{wp_version}/posts/<id>
-     *
-     * @param int $id
-     *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function post(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_POST, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /wp/{wp_version}/posts/<parent_id>/revisions
-     *
-     * @param int $id
-     *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function postRevisions(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_POST_REVISIONS, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|DELETE /wp/{wp_version}/posts/<parent_id>/revisions/<id>
-     *
-     * @param int $postID
-     * @param int $revisionID
-     *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function postRevision(int $postID, int $revisionID)
-    {
-        $this->setWpUrl(self::ROUTE_POST_REVISION, [ $postID, $revisionID ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST /wp/{wp_version}/pages
-     *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function pages()
-    {
-        $this->setWpUrl(self::ROUTE_PAGES);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST|DELETE /wp/{wp_version}/pages/<id>
-     *
-     * @param int $id
-     *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function page(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_PAGE, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST /wp/{wp_version}/media
-     *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function medias()
-    {
-        $this->setWpUrl(self::ROUTE_MEDIAS);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST|DELETE /wp/{wp_version}/media/<id>
-     *
-     * @param int $id
-     *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function media(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_MEDIA, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /wp/{wp_version}/types
-     *
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function types()
-    {
-        $this->setWpUrl(self::ROUTE_TYPES);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /wp/{wp_version}/types/<id>
-     *
-     * @param int $id
-     * @return $this
-     * @throws \Exception
-     */
-    public function type(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_TYPE, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /wp/{wp_version}/statuses
-     *
-     * @return $this
-     * @throws \Exception
-     */
-    public function statuses()
-    {
-        $this->setWpUrl(self::ROUTE_STATUSES);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /wp/{wp_version}/statuses/<id>
-     *
-     * @param int $id
-     * @return $this
-     * @throws \Exception
-     */
-    public function status(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_STATUS, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST /wp/{wp_version}/comments
-     *
-     * @return $this
-     * @throws \Exception
-     */
-    public function comments()
-    {
-        $this->setWpUrl(self::ROUTE_COMMENTS);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST|DELETE /wp/{wp_version}/comments/<id>
-     *
-     * @param int $id
-     * @return $this
-     * @throws \Exception
-     */
-    public function comment(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_COMMENT, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /wp/{wp_version}/taxonomies
-     *
-     * @return $this
-     * @throws \Exception
-     */
-    public function taxonomies()
-    {
-        $this->setWpUrl(self::ROUTE_TAXONOMIES);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /wp/{wp_version}/taxonomies/<id>
-     *
-     * @param int $id
-     * @return $this
-     * @throws \Exception
-     */
-    public function taxonomy(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_TAXONOMY, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST /wp/{wp_version}/categories
-     *
-     * @return $this
-     * @throws \Exception
-     */
-    public function categories()
-    {
-        $this->setWpUrl(self::ROUTE_CATEGORIES);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST|DELETE /wp/{wp_version}/categories/<id>
-     *
-     * @param int $id
-     * @return $this
-     * @throws \Exception
-     */
-    public function category(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_CATEGORY, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST /wp/{wp_version}/tags
-     *
-     * @return $this
-     * @throws \Exception
-     */
-    public function tags()
-    {
-        $this->setWpUrl(self::ROUTE_TAGS);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST|DELETE /wp/{wp_version}/tags/<id>
-     *
-     * @param int $id
-     * @return $this
-     * @throws \Exception
-     */
-    public function tag(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_TAG, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST /wp/{wp_version}/users
-     *
-     * @return $this
-     * @throws \Exception
-     */
-    public function users()
-    {
-        $this->setWpUrl(self::ROUTE_USERS);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST|DELETE /wp/{wp_version}/users/<id>
-     *
-     * @param int $id
-     * @return $this
-     * @throws \Exception
-     */
-    public function user(int $id)
-    {
-        $this->setWpUrl(self::ROUTE_USER, [ $id ]);
-
-        return $this;
-    }
-
-    /**
-     * @api GET|POST /wp/{wp-version}/users
-     *
-     * @return $this
-     * @throws \Exception
-     */
-    public function me()
-    {
-        $this->setWpUrl(self::ROUTE_USER_ME);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /wp/{wp-version}/settings
-     *
-     * @return $this
-     * @throws \Exception
-     */
-    public function settings()
-    {
-        $this->setWpUrl(self::ROUTE_SETTINGS);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /acf/{acf-version}
-     *
-     * @return $this
-     * @throws \Exception
-     */
-    public function acf()
-    {
-        $this->setAcfUrl(self::ROUTE_INDEX);
-
-        return $this;
-    }
-
-    /**
-     * @api GET /acf/{acf-version}/options/<id>
-     *
-     * @param string $id
-     * @return $this
-     * @throws \Exception
-     */
-    public function options(string $id = 'option')
-    {
-        $this->setAcfUrl(self::ROUTE_ACF_OPTIONS, [$id]);
-
-        return $this;
-    }
-
-    /* ----------------------------------------------------------------------------------- */
-
-    public function getDefaultBuild()
-    {
-        return [
-            'fields' => []
-        ];
-    }
-
-    public function build(array $params = [])
-    {
-
-    }
-
-    /**
-     * @return mixed
-     * @throws \Exception
-     */
-    public function get()
-    {
-        $this->validateOneRequest();
-
-        return $this->request('GET', $this->url, [
-            'query' => $this->params
-        ]);
-    }
-
-    /**
-     * @param array $data
-     * @return array|null
-     * @throws \Exception
-     */
-    public function save(array $data = [])
-    {
-        $this->validateOneRequest();
-
-        return $this->request('POST', $this->url, [
-            'query' => $this->params,
-            'form_params' => $data
-        ]);
-    }
-
-    /**
-     * @return array|null
-     * @throws \Exception
-     */
-    public function delete()
-    {
-        $this->validateOneRequest();
-
-        return $this->request('DELETE', $this->url, [
-            'query' => $this->params
-        ]);
-    }
-
-    /* ----------------------------------------------------------------------------------- */
-
-    /**
-     * @throws \Exception
-     */
-    protected function validateOneRequest()
-    {
-        if (empty($this->url)) {
-            throw new \Exception('You need to set what you want to receive before make a request.');
-        }
-    }
-
-    /**
-     * @param $url
-     * @return string
-     * @throws \Exception
-     */
-    protected function getBaseUrl($url)
-    {
-        if (! empty($this->url)) {
-            throw new \Exception('You have already choose what you want to take from WordPress site.');
-        }
-
-        return self::ROUTE_BASE . $url;
-    }
-
-    /**
-     * @param $url
-     * @param array $params
-     * @throws \Exception
-     */
-    protected function setBaseUrl($url, array $params = [])
-    {
-        if (! empty($params)) {
-            $url = sprintf($url, ...$params);
-        }
-
-        $this->url = $this->getBaseUrl($url);
-    }
-
-    /**
-     * @param $url
-     * @param array $params
-     * @throws \Exception
-     */
-    protected function setWpUrl($url, array $params = [])
-    {
-        if (! empty($params)) {
-            $url = sprintf($url, ...$params);
-        }
-
-        $this->setBaseUrl($this->getRouteWp($url));
-    }
-
-    /**
-     * @param $url
-     * @param array $params
-     * @throws \Exception
-     */
-    protected function setAcfUrl($url, array $params = [])
-    {
-        if (! empty($params)) {
-            $url = sprintf($url, ...$params);
-        }
-
-        $this->setBaseUrl($this->getRouteAcf($url));
-    }
-
-    /**
-     * @param $method
-     * @param $uri
-     * @param array $options
-     * @return mixed
-     */
-    protected function request($method, $uri, array $options = [])
-    {
-        $response = $this->client->request($method, $uri, $options);
-
-        $this->clearUrl();
-
-        return json_decode($response->getBody()->getContents(), true);
-    }
-
-    /**
-     * @return void
-     */
-    protected function clearUrl()
-    {
-        $this->url = '';
+        return new PostsResource($this->getClient($this->getParam('client')));
     }
 }
